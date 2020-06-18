@@ -1,24 +1,26 @@
 const express = require("express");
-const logger = require("morgan");
 const mongoose = require("mongoose");
-const compression = require("compression");
 
-const PORT = 3000;
+const PORT = process.env.PORT || 8080;
 
 const app = express();
 
-app.use(logger("dev"));
-
-app.use(compression());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost/budget", {
-  useNewUrlParser: true,
-  useFindAndModify: false
-});
+let dataUri =
+  "mongodb://heroku_z5p7z064:kkfh025gr3rgg3iea6n4gp4rnb@ds013738.mlab.com:13738/heroku_z5p7z064";
+
+if (process.env.MONGODB_URI) {
+  mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+  });
+} else {
+  mongoose.connect(dataUri);
+}
 
 // routes
 app.use(require("./routes/api.js"));
